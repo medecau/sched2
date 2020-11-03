@@ -11,29 +11,29 @@ The new scheduler class provides two new methods.
 
 
 ## Classic example
-```
+```python
 import time
 import sched2
 
-def print_time():
+def some_function():
     print(time.time())
 
 s = sched2.scheduler()
-s.repeat(delay=1, priority=0, action=print_time)
+s.repeat(delay=1, priority=0, action=some_function)
 
 s.run()  # runs forever...
 ```
 
 
 ## Decorator example
-```
+```python
 import time
 import sched2
 
 s = sched2.scheduler()
 
 @s.every(1, 0)
-def print_time():
+def some_function():
     print(time.time())
 
 s.run()  # never stops...
