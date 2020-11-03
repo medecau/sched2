@@ -14,7 +14,7 @@ class scheduler(sched.scheduler):
             action()
             self.enter(interval, priority, repeater, (partial_action,))
 
-        s.enter(interval, priority, repeater, (partial_action,))
+        self.enter(interval, priority, repeater, (partial_action,))
 
     def every(self, interval, priority):
         """A variant of repeat as a decorator."""
