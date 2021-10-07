@@ -3,7 +3,7 @@ import sched
 
 
 class scheduler(sched.scheduler):
-    def repeat(self, interval, priority, action, argument=None, kwargs=None):
+    def repeat(self, delay, priority, action, argument=None, kwargs=None):
         """A variant of enter that re-enters itself."""
         argument = argument if argument else ()
         kwargs = kwargs if kwargs else {}
@@ -12,10 +12,10 @@ class scheduler(sched.scheduler):
 
         def repeater(action):
             action()
-            self.enter(interval, priority, repeater, (partial_action,))
+            self.enter(delay, priority, repeater, (partial_action,))
 
-        self.enter(interval, priority, repeater, (partial_action,))
+        self.enter(delay, priority, repeater, (partial_action,))
 
-    def every(self, interval, priority):
+    def every(self, delay, priority):
         """A variant of repeat as a decorator."""
-        return partial(self.repeat, interval, priority)
+        return partial(self.repeat, delay, priority)
