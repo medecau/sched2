@@ -2,11 +2,16 @@ from functools import partial
 import sched
 
 
+__all__ = ["scheduler"]
+
+_sentinel = object()
+
+
 class scheduler(sched.scheduler):
-    def repeat(self, delay, priority, action, argument=None, kwargs=None):
+    def repeat(self, delay, priority, action, argument=(), kwargs=_sentinel):
         """A variant of enter that re-enters itself."""
-        argument = argument if argument else ()
-        kwargs = kwargs if kwargs else {}
+        if kwargs is _sentinel:
+            kwargs = {}
 
         partial_action = partial(action, *argument, **kwargs)
 
