@@ -1,8 +1,10 @@
 [tool.poetry]
 name = "sched2"
-version = "0.2.0"
+version = "0.3.0"
 description = "Event scheduler 2"
 authors = ["Pedro Rodrigues <medecau@gmail.com>"]
+license = "MIT"
+readme = "README.md"
 homepage = "https://github.com/medecau/sched2"
 
 [tool.poetry.dependencies]
