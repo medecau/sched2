@@ -35,6 +35,6 @@ class scheduler(sched.scheduler):
 
         self.enter(delay, priority, repeater, (partial_action,))
 
-    def every(self, delay, priority):
+    def every(self, delay, priority=0):
         """A variant of repeat as a decorator."""
         return partial(self.repeat, delay, priority)

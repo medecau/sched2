@@ -32,7 +32,7 @@ sc = scheduler()
 
 
 # repeatedly print public IP every 60 seconds
-@sc.every(60, 0)
+@sc.every(60)
 def echo_ip():
     ip = urlopen("https://icanhazip.com/").read().decode("utf-8").strip()
     print(f"ip: {ip}")
@@ -71,7 +71,7 @@ sc.repeat(delay=10, priority=1, action=echo_time_elapsed)
 
 
 # schedule a funcion by decorating it
-@sc.every(delay=15, priority=0)
+@sc.every(delay=15)
 def print_current_time():
     iso_dt = datetime.utcnow().isoformat()
     print(f"decorated function - {iso_dt}")
@@ -79,7 +79,7 @@ def print_current_time():
 
 # you can also use datetime.timedelta objects
 # see: https://docs.python.org/3/library/datetime.html#timedelta-objects
-@sc.every(delay=timedelta(minutes=1), priority=0)
+@sc.every(delay=timedelta(minutes=1))
 def echo_iso_date_every_minute():
     iso_dt = datetime.utcnow().isoformat()
     print(f"decorated function with timedelta - {iso_dt}")
