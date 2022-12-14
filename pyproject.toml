@@ -2,7 +2,7 @@
 name = "sched2"
 version = "0.3.0"
 description = "Event scheduler 2"
-authors = ["Pedro Rodrigues <medecau@gmail.com>"]
+authors = ["Pedro Rodrigues <me@pdbr.org>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/medecau/sched2"
