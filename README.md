@@ -1,90 +1,78 @@
-# Event scheduler 2
+The `sched2` module provides a simple and intuitive way to schedule the execution of code in Python. For example, it allows you to schedule a function to be called at a specific time or after a particular delay or to schedule a function to be called repeatedly at a specific time interval. This can be useful for automating tasks or scheduling the execution of code without having to write your own scheduling logic. In addition, it is lightweight and easy to use, making it an excellent choice for scheduling the execution of code in Python.
 
-`sched2`' provides a *subclass* of `sched.scheduler` with extra functionality.
-If you're already using `sched` then `sched2` is a drop-in-place change.
+`sched2` implements a subclass of the `sched.scheduler` class from Python's standard library that adds additional functionality. This means that `sched2` includes all of the features and functionality of the `sched` module and adds extra methods. As a result, you can use `sched2` in place of `sched` in your code without any further modifications, and you will have access to the additional features provided by `sched2`. These other features include the `repeat` method and the `every` decorator, which allow you to repeatedly schedule a function to be called at a specific time interval.
 
-## The extra functionality
-- `enter` - now also accepts `datetime.timedelta` objects as values for the delta parameter.
-- `repeat` - a new method with the same signature as `enter` that re-schedules `action` after it returns.
-- `every` -  is a decorator variant of `repeat` that schedules the decorated function at definition time.
+# Functionality
+- Schedule the execution of code at specific times or intervals
+- Schedule repeat function calls at specific time intervals
+- Simple and intuitive interface for scheduling code
+- Lightweight and easy to use
+- No external dependencies
 
- ### Enter
-Schedules an `action` to be called only once after some `delay` whereas `repeat` will re-schedule the `action` to be called again and again forever. It does this by repeatedly pushing the `action` *callable* back into the scheduler queue. The `delay` and `priority` values are fixed for all reintroductions into the queue.
+# Install
 
-### Every
-A decorator that provides a friendly way of scheduling functions at definition time.
+To install the sched2 module, you can use pip, the package installer for Python. Open a terminal and run the following command:
 
+```bash
+pip install sched2
+```
 
-## Install
+# Examples
 
-`pip install sched2`
-
-
-## Use
-
+The code bellow defines a function that checks if the IP address has changed and prints a message if it has. Then it creates an instance of a scheduler class and uses the `repeat` method to schedule the IP check function to run every two minutes. Finally, it starts the scheduler, so the IP check function will run indefinitely.
 
 ```python
 from urllib.request import urlopen
 from sched2 import scheduler
 
 
+def check_ip():
+    # Get the public IP address
+    global current_ip
+    ip = urlopen("https://icanhazip.com/").read().decode("utf-8").strip()
+
+    # Check if the IP address has changed
+    if ip != current_ip:
+        current_ip = ip
+        print(f"IP changed to {ip}")
+
+
+# Initialize the current_ip variable to None
+current_ip = None
+
+# Create a scheduler
 sc = scheduler()
 
+# Run the check_ip function every 120 seconds
+sc.repeat(120, 1, check_ip)
 
-# repeatedly print public IP every 60 seconds
-@sc.every(60)
-def echo_ip():
-    ip = urlopen("https://icanhazip.com/").read().decode("utf-8").strip()
-    print(f"ip: {ip}")
-
+# Run the scheduler
 sc.run()
 ```
 
-
-Now a less realistic example showing all the extra functionality
+The following code creates an instance of a scheduler class and decorates a function, so it runs every two minutes. First, the decorated function gets the public IP address and checks if it has changed. If it has, it updates and prints a message. Finally, it starts the scheduler, so the decorated function runs indefinitely.
 
 ```python
-from time import time
-from datetime import datetime, timedelta
-
+from urllib.request import urlopen
 from sched2 import scheduler
 
-
-started_at = time()
-
-# we'll use this in a bit
-def echo_time_elapsed():
-    seconds_since_started = round(time() - started_at, 2)
-    print(f"started {seconds_since_started}s ago")
-
-
-print(f"started at {started_at}")
-
-
-# create a scheduler object
+# Create a scheduler
 sc = scheduler()
 
 
-# schedule calling a function repeatedly
-# with a delay of 10 seconds between calls
-sc.repeat(delay=10, priority=1, action=echo_time_elapsed)
+@sc.every(120)  # Run every two minutes
+def check_ip():
+    # Get the public IP address and check if it has changed
+    global current_ip
+    ip = urlopen("https://icanhazip.com/").read().decode("utf-8").strip()
+    if ip != current_ip:
+        current_ip = ip
+        print(f"IP changed to {ip}")
 
 
-# schedule a funcion by decorating it
-@sc.every(delay=15)
-def print_current_time():
-    iso_dt = datetime.utcnow().isoformat()
-    print(f"decorated function - {iso_dt}")
+# Initialize the current_ip variable to None
+current_ip = None
 
-
-# you can also use datetime.timedelta objects
-# see: https://docs.python.org/3/library/datetime.html#timedelta-objects
-@sc.every(delay=timedelta(minutes=1))
-def echo_iso_date_every_minute():
-    iso_dt = datetime.utcnow().isoformat()
-    print(f"decorated function with timedelta - {iso_dt}")
-
-
-# run the scheduler
+# Run the scheduler
 sc.run()
 ```
