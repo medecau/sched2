@@ -1,12 +1,12 @@
 name: website
 
-# build the documentation whenever there are new commits on main or new tags
+# build the documentation whenever there are new tags
 on:
   push:
-    branches:
-      - main
     tags:
       - '*'
+    # branches:
+    #   - main
 
 # security: restrict permissions for CI jobs.
 permissions:
