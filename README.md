@@ -11,7 +11,7 @@ The `sched2` module provides a simple and intuitive way to schedule the executio
 
 # Install
 
-To install the sched2 module, you can use pip, the package installer for Python. Open a terminal and run the following command:
+To install the `sched2` module, you can use `pip`, the package installer for Python. Open a terminal and run the following command:
 
 ```bash
 pip install sched2
@@ -76,3 +76,9 @@ current_ip = None
 # Run the scheduler
 sc.run()
 ```
+
+# Source Code and Issues
+
+Help improve sched2 by reporting any issues or suggestions on our issue tracker at [github.com/medecau/sched2/issues](https://github.com/medecau/sched2/issues).
+
+Get involved with the development, check out the source code at [github.com/medecau/sched2](https://github.com/medecau/sched2).

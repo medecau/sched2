@@ -5,7 +5,7 @@ description = "Event scheduler 2"
 authors = ["Pedro Rodrigues <me@pdbr.org>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/medecau/sched2"
+homepage = "https://medecau.github.io/sched2/"
 
 [tool.poetry.dependencies]
 python = "^3.7"
