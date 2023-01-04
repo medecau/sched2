@@ -2,12 +2,10 @@ The `sched2` module provides a simple and intuitive way to schedule the executio
 
 `sched2` implements a subclass of the `sched.scheduler` class from Python's standard library that adds additional functionality. This means that `sched2` includes all of the features and functionality of the `sched` module and adds extra methods. As a result, you can use `sched2` in place of `sched` in your code without any further modifications, and you will have access to the additional features provided by `sched2`. These other features include the `repeat` method and the `every` decorator, which allow you to repeatedly schedule a function to be called at a specific time interval.
 
-# Functionality
-- Schedule the execution of code at specific times or intervals
-- Schedule repeat function calls at specific time intervals
+# Features
+- Schedule tasks to run one time or on a recurring basis
 - Simple and intuitive interface for scheduling code
-- Lightweight and easy to use
-- No external dependencies
+- Lightweight and no extra dependencies
 
 # Install
 
