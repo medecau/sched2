@@ -2,6 +2,7 @@
 .. include:: README.md
 """
 import sched
+import time
 from datetime import datetime, timedelta
 from functools import partial
 
@@ -18,7 +19,7 @@ class scheduler(sched.scheduler):
     and a decorator for scheduling events to run at regular intervals.
     """
 
-    def __init__(self, timefunc, delayfunc):
+    def __init__(self, timefunc=time.time, delayfunc=time.sleep):
         super().__init__(timefunc, delayfunc)
 
     def enter(self, delay, priority, action, argument=(), kwargs=_sentinel):
