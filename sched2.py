@@ -67,6 +67,11 @@ class scheduler(sched.scheduler):
 
         self.enter(delay, priority, repeater, (partial_action,))
 
+        # this return value is used by the decorator
+        # do not change this to return partial_action
+        # we return the original action so it can be decorated multiple times
+        return action
+
     def every(self, delay, priority=0, immediate=True):
         """Schedule an event to be run at regular intervals using a decorator.
 
