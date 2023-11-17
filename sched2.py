@@ -41,7 +41,9 @@ class scheduler(sched.scheduler):
 
         return super().enter(delay, priority, action, argument, kwargs)
 
-    def repeat(self, delay, priority, action, argument=(), kwargs=_sentinel):
+    def repeat(
+        self, delay, priority, action, immediate=True, argument=(), kwargs=_sentinel
+    ):
         """Schedule an event to be run at regular intervals.
 
         This method is a variant of the `sched2.enter` method that re-schedules itself
@@ -56,13 +58,16 @@ class scheduler(sched.scheduler):
 
         partial_action = partial(action, *argument, **kwargs)
 
+        if immediate:
+            self.enter(0, priority, partial_action)
+
         def repeater(action):
             action()
             self.enter(delay, priority, repeater, (partial_action,))
 
         self.enter(delay, priority, repeater, (partial_action,))
 
-    def every(self, delay, priority=0):
+    def every(self, delay, priority=0, immediate=True):
         """Schedule an event to be run at regular intervals using a decorator.
 
         This method is a variant of the `sched2.repeat` method that can be used as a
@@ -70,4 +75,7 @@ class scheduler(sched.scheduler):
         intervals by specifying the `delay` and `priority` as arguments. The
         default `priority` is `0`.
         """
-        return partial(self.repeat, delay, priority)
+
+        # we return a partial application of repeat
+        # this will be immediately called to decorate the function
+        return partial(self.repeat, delay, priority, immediate=immediate)
