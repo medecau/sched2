@@ -2,8 +2,6 @@
 .. include:: README.md
 """
 import sched
-import time
-from datetime import datetime, timedelta
 from functools import partial
 
 __all__ = ["scheduler"]
@@ -19,28 +17,6 @@ class scheduler(sched.scheduler):
     and a decorator for scheduling events to run at regular intervals.
     """
 
-    def __init__(self, timefunc=time.time, delayfunc=time.sleep):
-        super().__init__(timefunc, delayfunc)
-
-    def enter(self, delay, priority, action, argument=(), kwargs=_sentinel):
-        """Schedule an event to be run at a specific time.
-
-        This variant of the `sched.enter` method allows the delay argument to be
-        specified as a `datetime.timedelta` object. If the `kwargs` argument
-        is not provided, it defaults to an empty dictionary.
-        """
-        if isinstance(delay, timedelta):
-            # Convert the timedelta delay to a number of seconds
-            delay = delay.total_seconds()
-        elif isinstance(delay, datetime):
-            # Calculate the number of seconds until the specified datetime
-            delay = (delay - datetime.now()).total_seconds()
-
-        if kwargs is _sentinel:
-            kwargs = {}
-
-        return super().enter(delay, priority, action, argument, kwargs)
-
     def repeat(
         self, delay, priority, action, immediate=True, argument=(), kwargs=_sentinel
     ):
@@ -50,8 +26,6 @@ class scheduler(sched.scheduler):
         after each run. If the `kwargs` argument is not provided, it defaults
         to an empty dictionary.
         """
-        if isinstance(delay, datetime):
-            raise TypeError("The delay argument cannot be a datetime object")
 
         if kwargs is _sentinel:
             kwargs = {}
