@@ -1,11 +1,4 @@
-The `sched2` module provides a simple and intuitive way to schedule the execution of code in Python. For example, it allows you to schedule a function to be called at a specific time or after a particular delay or to schedule a function to be called repeatedly at a specific time interval. This can be useful for automating tasks or scheduling the execution of code without having to write your own scheduling logic. In addition, it is lightweight and easy to use, making it an excellent choice for scheduling the execution of code in Python.
-
-`sched2` implements a subclass of the `sched.scheduler` class from Python's standard library that adds additional functionality. This means that `sched2` includes all of the features and functionality of the `sched` module and adds extra methods. As a result, you can use `sched2` in place of `sched` in your code without any further modifications, and you will have access to the additional features provided by `sched2`. These other features include the `repeat` method and the `every` decorator, which allow you to repeatedly schedule a function to be called at a specific time interval.
-
-# Features
-- Schedule tasks to run one time or on a recurring basis
-- Simple and intuitive interface for scheduling code
-- Lightweight and no extra dependencies
+The `sched2` module is a subclass of Python's `sched.scheduler`, designed for interval-based task scheduling. It extends the standard sched module with additional features such as the `repeat` method and the `every` decorator, allowing for regular interval-based execution of functions. It's a practical tool for automating tasks that need to run repeatedly after certain time delays.
 
 # Install
 
@@ -77,6 +70,4 @@ sc.run()
 
 # Source Code and Issues
 
-Help improve sched2 by reporting any issues or suggestions on our issue tracker at [github.com/medecau/sched2/issues](https://github.com/medecau/sched2/issues).
-
-Get involved with the development, check out the source code at [github.com/medecau/sched2](https://github.com/medecau/sched2).
+Help improve sched2 by reporting any issues or suggestions on the issue tracker at [github.com/medecau/sched2/issues](https://github.com/medecau/sched2/issues).

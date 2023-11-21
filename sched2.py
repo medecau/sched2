@@ -23,8 +23,19 @@ class scheduler(sched.scheduler):
         """Schedule an event to be run at regular intervals.
 
         This method is a variant of the `sched2.enter` method that re-schedules itself
-        after each run. If the `kwargs` argument is not provided, it defaults
-        to an empty dictionary.
+        after each run. It allows a function to be scheduled to run at regular
+        intervals by specifying the `delay` and `priority` as arguments.
+
+        The `immediate` argument controls whether the first run of the function
+        is scheduled immediately or after the specified delay. The default is
+        `True`, which schedules the first run immediately.
+
+        The `argument` and `kwargs` arguments are passed to the function when
+        it is called. If the `kwargs` argument is not provided, it defaults to
+        an empty dictionary.
+
+        In the event that the function returns a `True`ish value, the function
+        will not be re-scheduled.
         """
 
         if kwargs is _sentinel:
@@ -51,6 +62,13 @@ class scheduler(sched.scheduler):
         decorator. It allows a function to be scheduled to run at regular
         intervals by specifying the `delay` and `priority` as arguments. The
         default `priority` is `0`.
+
+        The `immediate` argument controls whether the first run of the function
+        is scheduled immediately or after the specified delay. The default is
+        `True`, which schedules the first run immediately.
+
+        In the event that the function returns a `True`ish value, the function
+        will not be re-scheduled.
         """
 
         # we return a partial application of repeat
