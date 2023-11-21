@@ -62,8 +62,8 @@ class scheduler(sched.scheduler):
             self.enter(0, priority, partial_action)
 
         def repeater(action):
-            action()
-            self.enter(delay, priority, repeater, (partial_action,))
+            if not action():
+                self.enter(delay, priority, repeater, (partial_action,))
 
         self.enter(delay, priority, repeater, (partial_action,))
 
