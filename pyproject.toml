@@ -8,14 +8,13 @@ readme = "README.md"
 homepage = "https://medecau.github.io/sched2/"
 
 [tool.poetry.dependencies]
-python = "^3.7"
-
-[tool.poetry.dev-dependencies]
+python = "^3.8"
 
 [tool.poetry.group.dev.dependencies]
 pdoc = "^12.3.0"
 isort = "^5.11.4"
 black = "^22.12.0"
+pytest = "^8.0.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
