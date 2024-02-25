@@ -1,6 +1,7 @@
 """
 .. include:: README.md
 """
+
 import sched
 from functools import partial
 
@@ -44,6 +45,7 @@ class scheduler(sched.scheduler):
         partial_action = partial(action, *argument, **kwargs)
 
         def repeater(action):
+            # if the action returns a Trueish value, do not re-schedule
             if not action():
                 self.enter(delay, priority, repeater, (partial_action,))
 

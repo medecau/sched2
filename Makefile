@@ -12,6 +12,10 @@ check:	## Run linters in check mode.
 	poetry run isort --check .
 	poetry run black --check .
 
+.PHONY: test
+test:	## Run tests.
+	poetry run pytest
+
 .PHONY: publish
 publish: check	## Publish to PyPI.
 	poetry publish --build
