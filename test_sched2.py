@@ -89,6 +89,7 @@ def test_parse_cron_wildcards():
     assert sched2.parse_field("*", 10) == set(range(11))
     assert sched2.parse_field("*/2", 10) == set(range(0, 11, 2))
     assert sched2.parse_field("*/15", 10) == {0}
+    assert sched2.parse_field("*/30", 59) == {0, 30}
 
 
 def test_parse_cron_ranges():
@@ -96,7 +97,7 @@ def test_parse_cron_ranges():
     assert sched2.parse_field("5-10", 10) == set(range(5, 11))
     assert sched2.parse_field("5-", 10) == set(range(5, 11))
     assert sched2.parse_field("-10", 10) == set(range(11))
-    assert sched2.parse_field("5-5", 60) == {5}
+    assert sched2.parse_field("5-5", 69) == {5}
 
     assert sched2.parse_field("5-10/2", 10) == set(range(5, 11, 2))
     assert sched2.parse_field("5-/2", 10) == set(range(5, 11, 2))
@@ -115,8 +116,8 @@ def test_parse_cron_random():
     assert sched2.parse_field("5~10/2", 10) <= set(range(5, 11))
     assert sched2.parse_field("5~/2", 10) <= set(range(5, 11))
     assert sched2.parse_field("~10/2", 10) <= set(range(11))
-    assert len(sched2.parse_field("~/30", 60)) == 2
-    assert len(sched2.parse_field("5~5", 60)) == 1
+    assert len(sched2.parse_field("~/30", 59)) == 2
+    assert len(sched2.parse_field("5~5", 59)) == 1
 
     # test a single known exact value
     # this tests the range and step parsing
@@ -162,8 +163,34 @@ def test_parsing_cron_rule():
         "day_of_week": set(range(7)),
     }
 
+    # minute 1 of every hour
+    rule = "1 * * * *"
+    assert sched2.parse_rule(rule) == {
+        "minute": {1},
+        "hour": set(range(24)),
+        "day": set(range(1, 32)),
+        "month": set(range(1, 13)),
+        "day_of_week": set(range(7)),
+    }
 
-def test_cron_checker():
+    rule = "5 * * * *"
+    assert sched2.parse_rule(rule) == {
+        "minute": {5},
+        "hour": set(range(24)),
+        "day": set(range(1, 32)),
+        "month": set(range(1, 13)),
+        "day_of_week": set(range(7)),
+    }
+
+
+def test_rule_checker():
     # sunday morning
     parsed_rule = sched2.parse_rule("0 9 * * 0")
     assert sched2.check_rule(parsed_rule, dt.datetime(2024, 2, 25, 9, 0))
+
+    # friday midnight
+    rule = sched2.parse_rule("0 0 * * 5")
+    assert sched2.check_rule(rule, dt.datetime(2024, 2, 23, 0, 0))
+
+    rule = sched2.parse_rule("1 * * * *")
+    assert sched2.check_rule(rule, dt.datetime(2024, 2, 25, 0, 1))

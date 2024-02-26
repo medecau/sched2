@@ -80,6 +80,50 @@ class scheduler(sched.scheduler):
         # this will be immediately called to decorate the function
         return partial(self.repeat, delay, priority, immediate=immediate)
 
+    def cron(self, rule, priority=0):
+        """Schedule an event to be run at specific times using a cron-like syntax.
+
+        A cron rule is a string with five space-separated fields that represent
+        the minute, hour, day, month, and day of the week. Each field can contain
+        a single value, a range of values, or a list of values separated by commas.
+
+        The implementation resembles the cron syntax used in OpenBSD's `cron` and
+        other Unix-like operating systems.
+
+        The fields support the following operators:
+
+        - `*` (asterisk) - matches all values
+        - `-` (hyphen) - matches a range of values
+        - `~` (tilde) - matches a random value
+        - `/` (slash) - modifies ranges to include only every nth value
+
+        Examples of valid cron rules include:
+
+        - `0 0 * * *` - midnight of every day
+        - `*/5 * * * *` - every 5 minutes
+        - `0 0 * * 5` - midnight of every Friday
+        - `0 0 1 */3 *` - midnight of the first day of every quarter
+        - `0 9 * * 1-5` - 9:00 of every weekday
+        - `0~10 9 * * 1-5` - a random minute just past 9:00 of every weekday
+        - `~/30 * * * *` - twice an hour at random minutes
+
+        Random values are chosen when the event is scheduled, and do not change
+        for the lifetime of the event.
+
+        The `priority` argument specifies the priority of the event in the
+        scheduler. The default is `0`.
+
+        """
+        parsed_rule = parse_rule(rule)
+
+        def cron_runner(action):
+            if check_rule(parsed_rule):
+                action()
+            delay = 60 - self.timefunc() % 60
+            self.enter(delay, priority, cron_runner, (action,))
+
+        return cron_runner
+
 
 field_pattern = re.compile(
     r"^(?P<start>\d{1,2})?(?P<operator>[*~-])?(?P<stop>\d{1,2})?(?:/(?P<step>\d{1,2}))?$"
