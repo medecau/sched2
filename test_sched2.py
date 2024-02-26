@@ -1,5 +1,9 @@
+import datetime as dt
+import random
 import time
+
 import pytest
+
 import sched2
 
 
@@ -53,3 +57,113 @@ def test_that_the_every_decorator_works(scheduler, action):
 
     scheduler.run(blocking=False)
     action.assert_called_once()
+
+
+def test_invalid_cron_fields_raise_value_error():
+    with pytest.raises(ValueError):
+        sched2.parse_field("a", 10)
+
+    with pytest.raises(ValueError):
+        sched2.parse_field("5-10-15", 10)
+
+    with pytest.raises(ValueError):
+        sched2.parse_field("5~10~15", 10)
+
+    with pytest.raises(ValueError):
+        sched2.parse_field("5/2", 10)
+
+    with pytest.raises(ValueError):
+        sched2.parse_field("5-15", 10)
+
+    with pytest.raises(ValueError):
+        sched2.parse_field("5~15", 10)
+
+    with pytest.raises(ValueError):
+        sched2.parse_field("--5", 10)
+
+    with pytest.raises(ValueError):
+        sched2.parse_field("5/-2", 10)
+
+
+def test_parse_cron_wildcards():
+    assert sched2.parse_field("*", 10) == set(range(11))
+    assert sched2.parse_field("*/2", 10) == set(range(0, 11, 2))
+    assert sched2.parse_field("*/15", 10) == {0}
+
+
+def test_parse_cron_ranges():
+    assert sched2.parse_field("5", 10) == {5}
+    assert sched2.parse_field("5-10", 10) == set(range(5, 11))
+    assert sched2.parse_field("5-", 10) == set(range(5, 11))
+    assert sched2.parse_field("-10", 10) == set(range(11))
+    assert sched2.parse_field("5-5", 60) == {5}
+
+    assert sched2.parse_field("5-10/2", 10) == set(range(5, 11, 2))
+    assert sched2.parse_field("5-/2", 10) == set(range(5, 11, 2))
+    assert sched2.parse_field("-10/2", 10) == set(range(0, 11, 2))
+
+    with pytest.raises(ValueError):
+        sched2.parse_field("1-13", 12, 1)
+
+    with pytest.raises(ValueError):
+        sched2.parse_field("0-12", 12, 1)
+
+
+def test_parse_cron_random():
+    # these are tested to make sure the random numbers are within the range
+    assert sched2.parse_field("5~10", 10) <= set(range(5, 11))
+    assert sched2.parse_field("5~10/2", 10) <= set(range(5, 11))
+    assert sched2.parse_field("5~/2", 10) <= set(range(5, 11))
+    assert sched2.parse_field("~10/2", 10) <= set(range(11))
+    assert len(sched2.parse_field("~/30", 60)) == 2
+    assert len(sched2.parse_field("5~5", 60)) == 1
+
+    # test a single known exact value
+    # this tests the range and step parsing
+    random.seed(0)
+    assert sched2.parse_field("5~10/2", 10) == {6, 8, 10}
+
+
+def test_parsing_cron_lists():
+    assert sched2.parse_field("1,2,3", 10) == {1, 2, 3}
+    assert sched2.parse_field("1,2,3-5", 10) == {1, 2, 3, 4, 5}
+    assert sched2.parse_field("-5/2,5-/3", 10) == {0, 2, 4, 5, 8}
+    assert sched2.parse_field("1-7,4-10", 10) == set(range(1, 11))
+
+
+def test_parsing_cron_rule():
+    # monday at 9am
+    rule = "0 9 * * 1"
+    assert sched2.parse_rule(rule) == {
+        "minute": {0},
+        "hour": {9},
+        "day": set(range(1, 32)),
+        "month": set(range(1, 13)),
+        "day_of_week": {0},
+    }
+
+    # every friday at midnight
+    rule = "0 0 * * 5"
+    assert sched2.parse_rule(rule) == {
+        "minute": {0},
+        "hour": {0},
+        "day": set(range(1, 32)),
+        "month": set(range(1, 13)),
+        "day_of_week": {4},
+    }
+
+    # first of august at noon
+    rule = "0 12 1 8 *"
+    assert sched2.parse_rule(rule) == {
+        "minute": {0},
+        "hour": {12},
+        "day": {1},
+        "month": {8},
+        "day_of_week": set(range(7)),
+    }
+
+
+def test_cron_checker():
+    # sunday morning
+    parsed_rule = sched2.parse_rule("0 9 * * 0")
+    assert sched2.check_rule(parsed_rule, dt.datetime(2024, 2, 25, 9, 0))
