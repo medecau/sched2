@@ -1,4 +1,4 @@
-The `sched2` module is a subclass of Python's `sched.scheduler`, designed for interval-based task scheduling. It extends the standard sched module with additional features such as the `repeat` method and the `every` decorator, allowing for regular interval-based execution of functions. It's a practical tool for automating tasks that need to run repeatedly after certain time delays.
+The `sched2` module extends the general purpose event scheduler `sched` from Python's standard library. `sched2.scheduler` is a subclass of `sched.scheduler` that adds new features such as the `every` and `cron` decorators. It's a practical tool for automating tasks that need to run repeatedly after certain time delays or at specific times.
 
 # Install
 
@@ -10,38 +10,7 @@ pip install sched2
 
 # Examples
 
-The code bellow defines a function that checks if the IP address has changed and prints a message if it has. Then it creates an instance of a scheduler class and uses the `repeat` method to schedule the IP check function to run every two minutes. Finally, it starts the scheduler, so the IP check function will run indefinitely.
-
-```python
-from urllib.request import urlopen
-from sched2 import scheduler
-
-
-def check_ip():
-    # Get the public IP address
-    global current_ip
-    ip = urlopen("https://icanhazip.com/").read().decode("utf-8").strip()
-
-    # Check if the IP address has changed
-    if ip != current_ip:
-        current_ip = ip
-        print(f"IP changed to {ip}")
-
-
-# Initialize the current_ip variable to None
-current_ip = None
-
-# Create a scheduler
-sc = scheduler()
-
-# Run the check_ip function every 120 seconds
-sc.repeat(120, 1, check_ip)
-
-# Run the scheduler
-sc.run()
-```
-
-The following code creates an instance of a scheduler class and decorates a function, so it runs every two minutes. First, the decorated function gets the public IP address and checks if it has changed. If it has, it updates and prints a message. Finally, it starts the scheduler, so the decorated function runs indefinitely.
+The code below uses the `every` decorator to schedule checking the public IP address every two minutes.
 
 ```python
 from urllib.request import urlopen
@@ -52,17 +21,35 @@ sc = scheduler()
 
 
 @sc.every(120)  # Run every two minutes
-def check_ip():
-    # Get the public IP address and check if it has changed
-    global current_ip
+def print_ip_address():
     ip = urlopen("https://icanhazip.com/").read().decode("utf-8").strip()
-    if ip != current_ip:
-        current_ip = ip
-        print(f"IP changed to {ip}")
+    print(f"Public IP address: {ip}")
+
+# Run the scheduler
+sc.run()
+```
 
 
-# Initialize the current_ip variable to None
-current_ip = None
+The following code does something similar, but here we use the `cron` decorator to schedule an email report to be sent every weekday at 9:00.
+
+```python
+from smtplib import SMTP_SSL
+from sched2 import scheduler
+
+# Create a scheduler
+sc = scheduler()
+
+
+@sc.cron("0 9 * * 1-5")  # Run every weekday at 9:00
+def send_report():
+    with SMTP_SSL("smtp.example.com") as smtp:
+        smtp.login("me@example.com", "password")
+        smtp.sendmail(
+            "me@example.com",
+            "team@example.com",
+            "Subject: Daily Report\n\nThe numbers are up!",
+        )
+
 
 # Run the scheduler
 sc.run()
