@@ -118,9 +118,9 @@ class scheduler(sched.scheduler):
 
         def cron_runner(action):
             if check_rule(parsed_rule):
-                action()
+                self.enter(0, priority, action)
             delay = 60 - self.timefunc() % 60
-            self.enter(delay, priority, cron_runner, (action,))
+            self.enter(delay, 0, cron_runner, (action,))
 
         return cron_runner
 
