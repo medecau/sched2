@@ -6,6 +6,7 @@ import datetime as dt
 import random
 import re
 import sched
+from collections import defaultdict
 from functools import partial
 
 __all__ = ["scheduler"]
@@ -20,6 +21,8 @@ class scheduler(sched.scheduler):
     including the ability to schedule events using relative time intervals
     and a decorator for scheduling events to run at regular intervals.
     """
+
+    __listeners = defaultdict(list)
 
     def repeat(
         self, delay, priority, action, immediate=True, argument=(), kwargs=_sentinel
@@ -123,6 +126,68 @@ class scheduler(sched.scheduler):
             self.enter(delay, 0, cron_runner, (action,))
 
         return cron_runner
+
+    @property
+    def listeners(self):
+        return self.__listeners.copy()
+
+    def on(self, event, priority=0, action=None):
+        """Register a function to be called when an event is emitted.
+
+        This method is a decorator that registers a function to be called when
+        an event is emitted.
+
+        The `event` argument is a string that represents
+        the name of the event.
+
+        The `priority` argument specifies the priority
+        of the event in the scheduler. The default is `0`.
+
+        The decorated function is called with the same arguments and keyword
+        arguments that are passed to the `emit` method.
+
+        """
+
+        def decorator(action):
+            # we use a tuple of (action, priority) as the value
+            self.__listeners[event].append((action, priority))
+
+            return action
+
+        if action is not None:
+            return decorator(action)
+
+        return decorator
+
+    def emit(self, event, *, delay=0, args=(), kwargs=None):
+        """Emit an event to call all registered listeners.
+
+        This method schedules calls to all registered listeners for the
+        specified event.
+
+        The `event` argument is a string that represents the name of the event.
+
+        The `delay` argument specifies the delay in seconds before the listeners
+        are called. The default is `0`.
+
+        The `args` and `kwargs` arguments are passed to the listeners when they
+        are called.
+
+        """
+        if kwargs is None:
+            kwargs = {}
+
+        if event not in self.__listeners:
+            return
+
+        # sort the listeners by priority
+        self.__listeners[event] = sorted(self.__listeners[event], key=lambda x: x[1])
+
+        # schedule calls to the listeners
+        for action, priority in self.__listeners[event]:
+            self.enter(delay, priority, action, args, kwargs)
+
+        return
 
 
 field_pattern = re.compile(

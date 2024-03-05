@@ -194,3 +194,67 @@ def test_rule_checker():
 
     rule = sched2.parse_rule("1 * * * *")
     assert sched2.check_rule(rule, dt.datetime(2024, 2, 25, 0, 1))
+
+
+def test_event_listener_is_called(scheduler, action):
+    scheduler.on("event")(action)
+    scheduler.emit("event")
+
+    time.time.return_value = 10
+    scheduler.run(blocking=False)
+
+    action.assert_called_once()
+
+
+def test_event_listener_is_not_called_for_different_event(scheduler, action):
+    scheduler.on("event")(action)
+    scheduler.emit("other_event")
+
+    time.time.return_value = 10
+    scheduler.run(blocking=False)
+
+    action.assert_not_called()
+
+
+def test_event_listener_is_called_with_arguments(scheduler, mocker):
+    def action(message): ...
+
+    action = mocker.Mock(action)
+    scheduler.on("event")(action)
+    scheduler.emit("event", kwargs={"message": "hello"})
+
+    time.time.return_value = 10
+    scheduler.run(blocking=False)
+
+    action.assert_called_once_with("hello")
+
+
+def test_multiple_event_listeners_are_called(scheduler, mocker):
+    action = mocker.Mock()
+    action2 = mocker.Mock()
+
+    scheduler.on("event")(action)
+    scheduler.on("event")(action2)
+
+    scheduler.emit("event")
+
+    time.time.return_value = 10
+    scheduler.run(blocking=False)
+
+    action.assert_called_once()
+    action2.assert_called_once()
+
+
+def test_event_listener_is_called_with_delay(scheduler, action):
+    scheduler.on("event", priority=1)(action)
+    scheduler.emit("event", delay=5)
+
+    time.time.return_value = 0
+    scheduler.run(blocking=False)
+
+    action.assert_not_called()
+
+    time.time.return_value = 10
+    scheduler.run(blocking=False)
+
+    action.assert_called_once()
