@@ -233,7 +233,7 @@ def parse_field(field, max, min=0):
                 if step > (stop - start):
                     start = random.randint(start, stop)
                 else:
-                    start = random.randint(start, start + step)
+                    start = random.randint(start, start + step - 1)
 
                 allowed.update(range(start, stop + 1, step))
 
