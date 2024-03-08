@@ -4,13 +4,12 @@ help:	## Show this help.
 
 .PHONY: lint
 lint:	## Run linters.
-	poetry run isort .
-	poetry run black .
+	ruff check --select I --fix .
+	ruff format .
 
 .Phony: check
 check:	## Run linters in check mode.
-	poetry run isort --check .
-	poetry run black --check .
+	ruff check .
 
 .PHONY: test
 test:	## Run tests.
