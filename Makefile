@@ -1,20 +1,20 @@
 .PHONY: help
-help:	## Show this help.
-	grep '^[^#[:space:]\.].*:' Makefile
+help:			## Show this help.
+	@grep '^[^#[:space:]\.].*:' Makefile
 
 .PHONY: lint
-lint:	## Run linters.
+fix:			## Run linters.
 	ruff check --select I --fix .
 	ruff format .
 
-.Phony: check
-check:	## Run linters in check mode.
-	ruff check .
+.PHONY: check
+check:			## Run linters in check mode.
+	ruff check --select I .
 
 .PHONY: test
-test:	## Run tests.
+test: check		## Run tests.
 	poetry run pytest
 
 .PHONY: publish
-publish: check	## Publish to PyPI.
+publish: test check	## Publish to PyPI.
 	poetry publish --build
