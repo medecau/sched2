@@ -125,6 +125,8 @@ class scheduler(sched.scheduler):
             delay = 60 - self.timefunc() % 60
             self.enter(delay, 0, cron_runner, (action,))
 
+            return action
+
         return cron_runner
 
     @property

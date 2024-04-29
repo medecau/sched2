@@ -21,6 +21,26 @@ def action(mocker):
     return mocker.Mock(return_value=False)
 
 
+def test_repeat_method_returns_action(scheduler, action):
+    repeat_return_value = scheduler.repeat(1, 1, action, immediate=False)
+    assert repeat_return_value is action
+
+
+def test_every_decorator_method_returns_action(scheduler, action):
+    every_return_value = scheduler.every(1)(action)
+    assert every_return_value is action
+
+
+def test_cron_decorator_method_returns_action(scheduler, action):
+    cron_return_value = scheduler.cron("* * * * *")(action)
+    assert cron_return_value is action
+
+
+def test_on_decorator_method_returns_action(scheduler, action):
+    on_return_value = scheduler.on("event")(action)
+    assert on_return_value is action
+
+
 def test_repeat_adds_a_single_event(scheduler, action):
     # starts empty
     assert len(scheduler.queue) == 0
