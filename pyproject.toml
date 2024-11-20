@@ -1,20 +1,27 @@
-[tool.poetry]
+[project]
 name = "sched2"
-version = "0.8.1"
+version = "0.8.2"
 description = "Event scheduler 2"
-authors = ["Pedro Rodrigues <me@pdbr.org>"]
-license = "MIT"
 readme = "README.md"
+requires-python = "<4.0,>=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Pedro Rodrigues", email = "me@pdbr.org"},
+]
+
+[project.urls]
 homepage = "https://medecau.github.io/sched2/"
 
-[tool.poetry.dependencies]
-python = "^3.8"
+[dependency-groups]
+dev = [
+    "pdoc<13.0.0,>=12.3.0",
+    "pytest<9.0.0,>=8.0.2",
+    "pytest-mock<4.0.0,>=3.12.0",
+]
 
-[tool.poetry.group.dev.dependencies]
-pdoc = "^12.3.0"
-pytest = "^8.0.2"
-pytest-mock = "^3.12.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.ruff.lint]
+extend-select =[
+    "I",  # imports
+    "ERA001",  # dead code
+    "T100",  # debugger
+]

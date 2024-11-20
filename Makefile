@@ -4,17 +4,19 @@ help:			## Show this help.
 
 .PHONY: lint
 fix:			## Run linters.
-	ruff check --select I --fix .
+	ruff check --fix .
 	ruff format .
 
 .PHONY: check
 check:			## Run linters in check mode.
-	ruff check --select I .
+	ruff check .
+	ruff format --check .
 
 .PHONY: test
 test: check		## Run tests.
-	poetry run pytest
+	uv run pytest
 
 .PHONY: publish
 publish: test check	## Publish to PyPI.
-	poetry publish --build
+	uv build
+	uv publish
