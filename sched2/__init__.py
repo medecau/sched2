@@ -157,10 +157,7 @@ class scheduler(sched.scheduler):
 
             return action
 
-        if action is not None:
-            return decorator(action)
-
-        return decorator
+        return decorator if action is None else decorator(action)
 
     def emit(self, event, *, delay=0, args=(), kwargs=None):
         """Emit an event to call all registered listeners.
@@ -219,19 +216,20 @@ def parse_field(field, max, min=0):
             raise ValueError(f"invalid field[{field}]")
 
         # compute allowed values
-        if operator in {"-", "~"}:
-            start = start if start is not None else min
-            stop = stop if stop is not None else max
-
         if operator == "*":
             step = step or 1
             allowed.update(range(min, max + 1, step))
 
         elif operator == "-":
+            start = min if start is None else start
+            stop = max if stop is None else stop
             step = step or 1
             allowed.update(range(start, stop + 1, step))
 
         elif operator == "~":
+            start = min if start is None else start
+            stop = max if stop is None else stop
+
             if step:  # multiple random values at regular intervals
                 if step > (stop - start):
                     start = random.randint(start, stop)
