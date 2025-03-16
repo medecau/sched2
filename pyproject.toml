@@ -1,6 +1,6 @@
 [project]
 name = "sched2"
-version = "0.8.2"
+version = "0.8.3"
 description = "Event scheduler 2"
 readme = "README.md"
 requires-python = "<4.0,>=3.8"
