@@ -4,7 +4,7 @@ version = "0.8.3"
 description = "Event scheduler 2"
 readme = "README.md"
 requires-python = "<4.0,>=3.8"
-license = {text = "MIT"}
+license = { file = "LICENSE" }
 authors = [
     {name = "Pedro Rodrigues", email = "me@pdbr.org"},
 ]
@@ -23,8 +23,8 @@ extend-select =[
 ]
 
 [build-system]
-requires = ['setuptools']
-build-backend = 'setuptools.build_meta'
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.tox]
 requires = ["tox>=4.19"]
