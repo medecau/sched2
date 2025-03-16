@@ -14,7 +14,7 @@ check:			## Run linters in check mode.
 
 .PHONY: test
 test: check		## Run tests.
-	uv run pytest
+	tox -qp auto
 
 .PHONY: publish
 publish: test check	## Publish to PyPI.
