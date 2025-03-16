@@ -78,6 +78,18 @@ def test_that_the_every_decorator_works(scheduler, action):
     scheduler.run(blocking=False)
     action.assert_called_once()
 
+    assert len(scheduler.queue) == 1
+
+
+def test_that_the_every_decorator_works_over_time(scheduler, action):
+    scheduler.every(1)(action)
+
+    for i in range(10):
+        time.time.return_value = i
+        scheduler.run(blocking=False)
+
+    assert action.call_count == 10
+
 
 def test_invalid_cron_fields_raise_value_error():
     with pytest.raises(ValueError):
@@ -278,3 +290,55 @@ def test_event_listener_is_called_with_delay(scheduler, action):
     scheduler.run(blocking=False)
 
     action.assert_called_once()
+
+
+def test_event_listener_takes_multiple_handlers_for_same_event(scheduler, mocker):
+    action = mocker.Mock()
+    action2 = mocker.Mock()
+
+    scheduler.on("event")(action)
+    scheduler.on("event")(action2)
+
+    scheduler.emit("event")
+
+    time.time.return_value = 10
+    scheduler.run(blocking=False)
+
+    action.assert_called_once()
+    action2.assert_called_once()
+
+
+def test_event_listener_can_decorate_one_function_with_multiple_events(
+    scheduler, mocker
+):
+    action = mocker.Mock()
+
+    action = scheduler.on("event")(action)
+    action = scheduler.on("other_event")(action)
+
+    scheduler.emit("event")
+    scheduler.emit("other_event")
+
+    time.time.return_value = 10
+    scheduler.run(blocking=False)
+
+    action.assert_has_calls([mocker.call(), mocker.call()])
+    assert action.call_count == 2
+
+
+def test_every_decorator_can_decorate_one_function_with_multiple_intervals(
+    scheduler, mocker
+):
+    # Create a mock that returns False (to ensure it gets rescheduled)
+    action = mocker.Mock(return_value=False)
+
+    # Test that we can apply multiple decorators
+    action = scheduler.every(1)(action)  # Run every 1 time unit
+
+    # Run scheduler 10 times
+    for i in range(10):
+        time.time.return_value = i
+        scheduler.run(blocking=False)
+
+    # We expect 10 calls because we run at every time unit
+    assert action.call_count == 10

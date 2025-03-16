@@ -50,13 +50,14 @@ class scheduler(sched.scheduler):
 
         partial_action = partial(action, *argument, **kwargs)
 
-        def repeater(action):
+        def repeater():
+            result = partial_action()
             # if the action returns a Trueish value, do not re-schedule
-            if not action():
-                self.enter(delay, priority, repeater, (partial_action,))
+            if not result:
+                self.enter(delay, priority, repeater)
 
         initial_delay = 0 if immediate else delay
-        self.enter(initial_delay, priority, repeater, (partial_action,))
+        self.enter(initial_delay, priority, repeater)
 
         # this return value is used by the decorator
         # do not change this to return partial_action
